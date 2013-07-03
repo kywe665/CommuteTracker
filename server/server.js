@@ -19,7 +19,24 @@
   }
 
   function router(rest) {
-    rest.get('/hello/:name?', getHello);
+    rest.get('/left/:name?', post(0));
+    rest.get('/arrived/:name?', post(1));
+  }
+  
+  function post(state) {
+    var data = {};
+    data.state = state;
+    data.timestamp = new Date().getTime();
+    $.ajax({
+      type: 'POST',
+      crossDomain: true,
+      contentType: "application/json",
+      url: dbIp,
+      data: data,
+      success: function(result) {
+        update(result);
+      }
+    });
   }
 
   app
