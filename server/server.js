@@ -1,4 +1,4 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true*/
+/*jshint strict:true node:true es5:true laxcomma:true laxbreak:true*/
 /*
  * SERVER
  */
@@ -10,33 +10,51 @@
     , _ = require('underscore')
     , forEachAsync = require('forEachAsync')
     , app = connect.createServer()
+    , http = require('http')
+    , options = {
+        hostname: 'localhost',
+        port: 5984,
+        path: '/commute-tracker',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     ;
 
-
-  function getHello(request, response) {
-    response.json(request.params);
-    response.end();
-  }
-
   function router(rest) {
-    rest.get('/left/:name?', post(0));
-    rest.get('/arrived/:name?', post(1));
+    rest.get('/left', left);
+    rest.get('/arrived', arrived);
   }
   
-  function post(state) {
+  function left (req, res) {
+    console.log(req.query['?id']);
+    postToCouch(0, res, req.query);
+  }
+  function arrived (req, res) {
+    postToCouch(1, res, req.query);
+  }
+
+  function postToCouch(state, res, query) {
     var data = {};
+    data.user = 'kywe665';
+    data.tripId = query['?id'];
     data.state = state;
     data.timestamp = new Date().getTime();
-    $.ajax({
-      type: 'POST',
-      crossDomain: true,
-      contentType: "application/json",
-      url: dbIp,
-      data: data,
-      success: function(result) {
-        update(result);
-      }
+    var req = http.request(options, function(res) {
+      console.log('STATUS: ' + res.statusCode);
+      console.log('HEADERS: ' + JSON.stringify(res.headers));
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        console.log('BODY: ' + chunk);
+      });
     });
+    req.on('error', function(e) {
+      console.log('problem with request: ' + e.message);
+    });
+    req.write(JSON.stringify(data));
+    req.end();
+    res.json({'cthulu':'oryleh'});
   }
 
   app

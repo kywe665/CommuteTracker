@@ -17,12 +17,12 @@
     "prepublish": "node deploy"
   },
   "dependencies": {
-    "connect": "2.x",
+    "connect": "2.3.6",
     "http-json": "1.x",
-    "connect_router": "1.x",
+    "connect_router": "1.8.6",
     "connect-cookieless-session": "0.6.x",
     "nowww": "1.x",
-    "connect-pathname": "1.x",
+    "connect-pathname": "0.6.x",
     "connect-xcors": "0.5.x",
     "express-chromeframe": "0.2.x",
     "underscore": ">=1.3.3 <1.4.0",
