@@ -16,8 +16,11 @@ html
     script(src="jquery-1.10.1.min.js")
     script(src="main.js")
   body
-    h1 Welcome to your CommuteTracker
-    h3 Optimize your commute by logging your trips below.
+    h1 Hello kywe665. Welcome to your CommuteTracker
+    h3 Not kywe665? Enter your username below:
+    input#username(type="text")(placeholder="username")[data-user="kywe665"]
+    input.update-user(type="button")(value="Update")
+    h2 Optimize your commute by logging your trips below.
     p Are you Leaving or Arriving?
     div.button-container
       input#leaving(type="button")(value="Leaving")

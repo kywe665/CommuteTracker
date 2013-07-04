@@ -1,10 +1,12 @@
 /*jshint es5:true laxcomma:true laxbreak:true immed:true latedef:true*/
 (function () {
-  var dbIp = "http://localhost:5984/commute-tracker";
-
+  var couchIp = "http://50.135.7.188:23987"
+    , couchTripView = couchIp + "/commute-tracker/_design/byTrip/_view/byTrip?group=true"
+    ;
+  var xmlHttp = new XMLHttpRequest();
   $(document).ready(function() {
     handlers();
-    getTripId();
+    getTrips();//TODO pass user
   });  
   function handlers() {
     $('body').on('click', '#leaving', function(){
@@ -15,16 +17,26 @@
     });
   }
 
-  function getTripId() {
-    var now = new Date()
-      , tripId = humanReadId(now)
-      ;
-    $('#trip-id').html('Your current trip ID is: ' + tripId);
-    $('#trip-id').attr('data-id', now.getTime());
+  function getTrips(user) {
+    console.log(couchTripView);
+    $.get(couchTripView, function(response) {
+        console.log(JSON.parse(response));
+        tripIsActive(JSON.parse(response));
+        calculateAndGraph(JSON.parse(response));
+    });
   }
-  
-  function humanReadId(time) {
-    var nowArray = (' ' + time).replace(/:/g,'-').split(' ')
+  function tripIsActive() {
+    //check if a trip is in progress
+    var now = new Date().getTime();
+    setTripId(now);//TODO send timestamp
+  }
+  function setTripId(timestamp) {
+    $('#trip-id').html('Your current trip ID is: ' + humanReadId(timestamp));
+    $('#trip-id').attr('data-id', timestamp);
+  }
+  function humanReadId(timestamp) {
+    var newDate = new Date(timestamp)
+      , nowArray = (' ' + newDate).replace(/:/g,'-').split(' ')
       , tripId = ''
       , i = 0
       ;
@@ -34,7 +46,7 @@
     tripId += '_' + nowArray[5];
     console.log(tripId);
     return tripId;
-  }  
+  }
 
   function post(path) {
     var data = {};
@@ -47,6 +59,11 @@
     });
   }
   function update(result) {
+    //TODO tell user if succesful and update UI
     console.log(result);
+  }
+
+  function calculateAndGraph(data) {
+    //TODO make sense of the data
   }
 }());
