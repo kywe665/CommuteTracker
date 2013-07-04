@@ -17,7 +17,14 @@
 
   function getTripId() {
     var now = new Date()
-      , nowArray = (' ' + now).replace(/:/g,'-').split(' ')
+      , tripId = humanReadId(now)
+      ;
+    $('#trip-id').html('Your current trip ID is: ' + tripId);
+    $('#trip-id').attr('data-id', now.getTime());
+  }
+  
+  function humanReadId(time) {
+    var nowArray = (' ' + time).replace(/:/g,'-').split(' ')
       , tripId = ''
       , i = 0
       ;
@@ -26,10 +33,9 @@
     }
     tripId += '_' + nowArray[5];
     console.log(tripId);
-    $('#trip-id').html('Your current trip ID is: ' + tripId);
-    $('#trip-id').attr('data-id', now.getTime());
-  }
-  
+    return tripId;
+  }  
+
   function post(path) {
     var data = {};
     $.ajax({

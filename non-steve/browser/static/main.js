@@ -24,7 +24,7 @@
   }
   
   function humanReadId(time) {
-    var nowArray = (' ' + now).replace(/:/g,'-').split(' ')
+    var nowArray = (' ' + time).replace(/:/g,'-').split(' ')
       , tripId = ''
       , i = 0
       ;
@@ -33,6 +33,7 @@
     }
     tripId += '_' + nowArray[5];
     console.log(tripId);
+    return tripId;
   }  
 
   function post(path) {
