@@ -28,7 +28,7 @@
   }
   
   function left (req, res) {
-    console.log(req.query['?id']);
+    console.log(req.query);
     postToCouch(0, res, req.query);
   }
   function arrived (req, res) {
@@ -41,6 +41,11 @@
     data.tripId = query['?id'];
     data.state = state;
     data.timestamp = new Date().getTime();
+    data.invalid = false;
+    if(query.invalid){
+      console.log('going to db invalid');
+      data.invalid = true;
+    }
     var req = http.request(options, function(res) {
       console.log('STATUS: ' + res.statusCode);
       console.log('HEADERS: ' + JSON.stringify(res.headers));

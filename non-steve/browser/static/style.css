@@ -1,3 +1,6 @@
 input{
   margin-right: 10px;
 }
+.css-hidden{
+  display: none;
+}

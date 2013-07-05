@@ -3,7 +3,6 @@
   var couchIp = "http://50.135.7.188:23987"
     , couchTripView = couchIp + "/commute-tracker/_design/byTrip/_view/byTrip?group=true"
     ;
-  var xmlHttp = new XMLHttpRequest();
   $(document).ready(function() {
     handlers();
     getTrips();//TODO pass user
@@ -15,24 +14,52 @@
     $('body').on('click', '#arriving', function(){
       post('/arrived');
     });
+    $('body').on('click', '#invalidate', function(){
+      post('/arrived', true);
+    });
   }
 
   function getTrips(user) {
     console.log(couchTripView);
     $.get(couchTripView, function(response) {
         console.log(JSON.parse(response));
-        tripIsActive(JSON.parse(response));
+        tripIsActive(JSON.parse(response).rows);
         calculateAndGraph(JSON.parse(response));
     });
   }
-  function tripIsActive() {
+  function tripIsActive(data) {
     //check if a trip is in progress
-    var now = new Date().getTime();
-    setTripId(now);//TODO send timestamp
+    var now = new Date().getTime()
+      , latest = 0
+      , temp = 0
+      ;
+    data.forEach(function(trip) {
+      if(trip.value.length === 1) {
+        temp = parseInt(trip.key.split('-')[0], 10);
+        if(temp > latest) {
+          latest = temp;
+        }
+      }
+    });
+    if(latest > 0) {
+      inATrip(latest);
+    }
+    else {
+      //new trip
+      setTripId(now);
+    }
   }
   function setTripId(timestamp) {
     $('#trip-id').html('Your current trip ID is: ' + humanReadId(timestamp));
     $('#trip-id').attr('data-id', timestamp);
+  }
+  function inATrip(timestamp) {
+    toggleHidden();
+    setTripId(timestamp);
+  }
+  function toggleHidden() {
+    console.log('toggled');
+    $('.toggle-hidden').toggleClass('css-hidden');
   }
   function humanReadId(timestamp) {
     var newDate = new Date(timestamp)
@@ -48,19 +75,32 @@
     return tripId;
   }
 
-  function post(path) {
-    var data = {};
+  function post(path, invalid) {
+    var url = path +'?id='+ $('#trip-id').attr('data-id');
+    if(invalid) {
+      console.log('sending invalid');
+      url += '&invalid=true';
+    }
     $.ajax({
       type: 'GET',
-      url: path +'?id='+ $('#trip-id').attr('data-id'),
+      url: url,
       success: function(result) {
-        update(result);
+        update(result, path);
       }
     });
   }
-  function update(result) {
+  function update(result, path) {
     //TODO tell user if succesful and update UI
-    console.log(result);
+    console.log(result); 
+    if(result.success) {
+      if(path === '/left'){
+        toggleHidden();
+      }
+      else {
+        getTrips();
+        toggleHidden();
+      }
+    }
   }
 
   function calculateAndGraph(data) {

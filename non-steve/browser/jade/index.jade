@@ -20,10 +20,14 @@ html
     h3 Not kywe665? Enter your username below:
     input#username(type="text")(placeholder="username")[data-user="kywe665"]
     input.update-user(type="button")(value="Update")
-    h2 Optimize your commute by logging your trips below.
-    p Are you Leaving or Arriving?
+    h2 Optimize your commute by logging your trips
+    p.toggle-hidden Are you ready to leave?
+    p.toggle-hidden.css-hidden Are you there yet?
     div.button-container
-      input#leaving(type="button")(value="Leaving")
-      input#arriving(type="button")(value="Arriving")
+      input.toggle-hidden#leaving(type="button")(value="Leaving")
+      input.toggle-hidden.css-hidden#arriving(type="button")(value="Arriving")
+    div.toggle-hidden.css-hidden
+      h2 Forgot to update an arrival? Invalidate your trip and start over below
+      input#invalidate(type="button")(value="Invalidate")
     div.trip-container
       h2#trip-id[data-id="n/a"] Your current trip ID is: (n/a)
