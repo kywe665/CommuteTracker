@@ -1,7 +1,7 @@
 /*jshint es5:true laxcomma:true laxbreak:true immed:true latedef:true*/
 (function () {
   var couchIp = "http://50.135.7.188:23987"
-    , couchTripView = couchIp + "/commute-tracker/_design/byTrip/_view/byTrip?group=true"
+    , couchTripView = couchIp + "/commute-tracker/_design/byTrip/_view/byTrip"
     ;
   $(document).ready(function() {
     handlers();
@@ -22,9 +22,10 @@
   function getTrips(user) {
     console.log(couchTripView);
     $.get(couchTripView, function(response) {
-        console.log(JSON.parse(response));
-        tripIsActive(JSON.parse(response).rows);
-        calculateAndGraph(JSON.parse(response));
+        var reducedData = reduceData(JSON.parse(response).rows);
+        console.log(reducedData);
+        tripIsActive(reducedData);
+        calculateAndGraph(reducedData);
     });
   }
   function tripIsActive(data) {
@@ -33,9 +34,9 @@
       , latest = 0
       , temp = 0
       ;
-    data.forEach(function(trip) {
-      if(trip.value.length === 1) {
-        temp = parseInt(trip.key.split('-')[0], 10);
+    Object.keys(data).forEach(function(trip) {
+      if(data[trip].length === 1) {
+        temp = parseInt(trip.split('-')[0], 10);
         if(temp > latest) {
           latest = temp;
         }
@@ -105,5 +106,18 @@
 
   function calculateAndGraph(data) {
     //TODO make sense of the data
+  }
+
+  function reduceData(data) {
+    var builder = {};
+    data.forEach(function(trip) {
+      if(builder[trip.key]) {
+        builder[trip.key].push(trip.value);
+      }
+      else {
+        builder[trip.key] = [trip.value];
+      }
+    });
+    return builder;
   }
 }());
